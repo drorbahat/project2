@@ -6,6 +6,10 @@ body {
     background-size: initial;
 }
 
-.navbar{
-    background-color: rgba(255, 255, 255, 0.966);
+.main-header{
+    background-color: rgba(255, 255, 255, 0.904);
+}
+
+.card{
+    margin: 20px 10px;
 }
