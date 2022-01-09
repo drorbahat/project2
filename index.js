@@ -1,17 +1,5 @@
 $(() => {
 
-    let spinner = `
-                    <div id="spinner-container">
-                        <div id="loading-spinner" class="d-flex justify-content-center">
-                            <div class="spinner-border" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                        </div>
-                    </div>
-                    `
-
-    $('#spinner-container').hide();
-
     const getData = () => {
         $.ajax({
             url: "https://api.coingecko.com/api/v3/coins/list",
@@ -29,11 +17,9 @@ $(() => {
     const displayDataToGrid = (first100Arr) => {
         const cardContainer = $('#cards-container')
         let cards = ``
-        let idNumCounter = 0
         first100Arr.forEach(element => {
-            idNumCounter++
             cards += `
-            <div class="col-sm-4 ">
+            <div class="col-sm-4">
                 <div class="card shadow">
                     <div class="card-body">
                         <div>
@@ -41,35 +27,46 @@ $(() => {
                         </div>
                         <p class="card-text">${element.name}</p>
                         <div class="custom-control custom-switch">
-                            <input type="checkbox" class="custom-control-input" id="switch${idNumCounter}" name="example">
-                            <label class="custom-control-label" for="switch${idNumCounter}"></label>
+                            <input type="checkbox" class="custom-control-input" id="${element.id}Switch" name="example">
+                            <label class="custom-control-label" for="${element.id}Switch"></label>
                         </div>
                         <br>
                         <button id="${element.id}" type="button" class="btn btn-primary more-info-button">show more</button>
-                        <div id="${element.id}Data" >
+                        <div id="${element.id}Data">
+                        </div>
+                        <div class="spinner-container" id="spinner${element.id}-container">
+                            <div id="loading-spinner" class="d-flex justify-content-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             `
         });
-
+        
         cardContainer.append(cards)
+        $(".spinner-container").hide()
         moreInfoFunction()
     }
 
     const moreInfoFunction = () => {
         $(".more-info-button").click(function () {
+
             $(this).next().collapse('toggle')
             if ($(this).next().children().length <= 0) {
                 let cardId = $(this).attr("id")
+
+                $(`#spinner${cardId}-container`).show()
+
                 $.ajax({
                     url: `https://api.coingecko.com/api/v3/coins/${cardId}`,
                     success: function (data) {
                         appendDataContainer(data)
                     }
                 });
-
                 const appendDataContainer = (data) => {
                     let moreInfo = `
                             <div class="more-data-container">
@@ -80,10 +77,13 @@ $(() => {
                                 </div>
                             `
                     $(this).next().append(moreInfo)
+
+                    $(`#spinner${cardId}-container`).hide()
                 }
             } else {
                 return
             }
+
         })
     }
 
@@ -91,9 +91,7 @@ $(() => {
 
 
     $('#home-button').click(function (e) {
-        $('#spinner-container').show();
         getData()
-        $('#spinner-container').hide();
     });
 
 
