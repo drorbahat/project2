@@ -45,8 +45,8 @@ $(() => {
                             <label class="custom-control-label" for="switch${idNumCounter}"></label>
                         </div>
                         <br>
-                        <button id="${element.id}" type="button" data-toggle="collapse" data-target="#${element.id}Data" aria-expanded="false" aria-controls="${element.id}Data" class="btn btn-primary more-info-button">show more</button>
-                        <div id="${element.id}Data" class="collapse">
+                        <button id="${element.id}" type="button" class="btn btn-primary more-info-button">show more</button>
+                        <div id="${element.id}Data" >
                         </div>
                     </div>
                 </div>
@@ -61,6 +61,7 @@ $(() => {
     const moreInfoFunction = () => {
         $(".more-info-button").click(function () {
             $(this).next().collapse('toggle')
+            if ($(this).next().children().length <= 0) {
                 let cardId = $(this).attr("id")
                 $.ajax({
                     url: `https://api.coingecko.com/api/v3/coins/${cardId}`,
@@ -71,15 +72,18 @@ $(() => {
 
                 const appendDataContainer = (data) => {
                     let moreInfo = `
-                        <div class="more-data-container">
-                                <p class="card-text">${data.market_data.current_price.usd}$</p>
-                                <p class="card-text">${data.market_data.current_price.eur}€</p>
-                                <p class="card-text">${data.market_data.current_price.ils}₪</p>
-                                <img src="${data.image.small}" alt="${data.symbol} img">
-                            </div>
-                        `
+                            <div class="more-data-container">
+                                    <p class="card-text">${data.market_data.current_price.usd}$</p>
+                                    <p class="card-text">${data.market_data.current_price.eur}€</p>
+                                    <p class="card-text">${data.market_data.current_price.ils}₪</p>
+                                    <img src="${data.image.small}" alt="${data.symbol} img">
+                                </div>
+                            `
                     $(this).next().append(moreInfo)
                 }
+            } else {
+                return
+            }
         })
     }
 
