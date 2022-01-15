@@ -46,7 +46,7 @@ $(() => {
             </div>
             `
         });
-        
+
         cardContainer.append(cards)
         $(".spinner-container").hide()
         moreInfoFunction()
@@ -64,16 +64,35 @@ $(() => {
                 $.ajax({
                     url: `https://api.coingecko.com/api/v3/coins/${cardId}`,
                     success: function (data) {
-                        appendDataContainer(data)
+                        saveMoreInfoToLocalStorage(data)
                     }
                 });
+
+                saveMoreInfoToLocalStorage = (data) => {
+                    let moreInfoObject = {
+                        usd: `${data.market_data.current_price.usd}`,
+                        eur: `${data.market_data.current_price.eur}`,
+                        ils: `${data.market_data.current_price.ils}`,
+                        imgSrc: `${data.image.small}`,
+                        symbol: `${data.symbol}`
+                    }
+                    localStorage.setItem(`moreInfoObject${data.symbol}`, JSON.stringify(moreInfoObject))
+                    setTimeout(() => {
+                        localStorage.removeItem(`moreInfoObject${data.symbol}`)
+                    }, 120000);
+                    appendDataContainer(data)
+                }
+
                 const appendDataContainer = (data) => {
+                    let moreInfoStringFromLocalStorage = localStorage.getItem(`moreInfoObject${data.symbol}`)
+                    moreInfoObjectFromLocalStorage = JSON.parse(moreInfoStringFromLocalStorage)
+
                     let moreInfo = `
                             <div class="more-data-container">
-                                    <p class="card-text">${data.market_data.current_price.usd}$</p>
-                                    <p class="card-text">${data.market_data.current_price.eur}€</p>
-                                    <p class="card-text">${data.market_data.current_price.ils}₪</p>
-                                    <img src="${data.image.small}" alt="${data.symbol} img">
+                                    <p class="card-text">${moreInfoObjectFromLocalStorage.usd}$</p>
+                                    <p class="card-text">${moreInfoObjectFromLocalStorage.eur}€</p>
+                                    <p class="card-text">${moreInfoObjectFromLocalStorage.ils}₪</p>
+                                    <img src="${moreInfoObjectFromLocalStorage.imgSrc}" alt="${moreInfoObjectFromLocalStorage.symbol} img">
                                 </div>
                             `
                     $(this).next().append(moreInfo)
@@ -83,12 +102,10 @@ $(() => {
             } else {
                 return
             }
-
         })
     }
 
-
-
+    
 
     $('#home-button').click(function (e) {
         getData()
